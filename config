@@ -18,18 +18,31 @@ if [ $ngx_found = no ]; then
         ngx_feature_libs="-L/usr/local/lib -L/opt/local/lib -ljansson"
     fi
     . auto/feature
+    
 fi
 
 if [ $ngx_found = yes ]; then
     ngx_addon_name=ngx_json_extractor_module
+    
+if test -n "$ngx_module_link"; then
+    ngx_module_type=HTTP
+    ngx_module_name=$ngx_addon_name
+    ngx_module_deps="$ngx_feature_deps"
+    ngx_module_srcs="$ngx_oauth_src"
+    ngx_module_libs="$ngx_feature_libs"
+    ngx_module_incs="$ngx_feature_path"
+    . auto/module
+else
     HTTP_MODULES="$HTTP_MODULES ngx_json_extractor_module"
     NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_feature_deps"
     NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_oauth_src"
     CORE_INCS="$CORE_INCS $ngx_feature_path"
     CORE_LIBS="$CORE_LIBS $ngx_feature_libs"
+ fi
 else 
     cat << END
     $0: error: the ngx_json_extractor_module addon needs libjansson.
 END
     exit 1
 fi
+
